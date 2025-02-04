@@ -4,7 +4,6 @@ precision mediump float;
 
 uniform float time;
 varying vec2 vUv;
-// https://thebookofshaders.com/06/
 vec3 hsb2rgb( in vec3 c ){
     vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0),
                              6.0) - 3.0) - 1.0,  0.0, 1.0);
@@ -17,11 +16,11 @@ vec3 stroke(float axis, float radius, float width, vec3 color) {
   float d = step(radius, axis + width * 0.5) - step(radius, axis - width * 0.5);
   return color * clamp(d, 0.0, 1.0);
 }
-// https://thebookofshaders.com/07/
+
 float circleSDF(vec2 uv, float pct) {
   return length(uv - 0.5) * pct;
 }
-// https://thebookofshaders.com/08/
+
 mat2 scale2D (vec2 amt) {
   return mat2 (amt.x, 0.0, 0.0, amt.y);
 }
@@ -42,15 +41,10 @@ void main () {
   vec3 color = vec3(0.0);
   vec3 curCol = hsb2rgb(vec3(1.0, 1.0, 1.0));
   for (float i = 0.0; i < 1.0; i += 0.1) {
-    float n = randomFloat(vec2(i + 0.9));
+    float n = 0.45; // randomFloat(vec2(i + 0.9));
     float h = hues[int(i * 10.0)] + n;
     curCol = hsb2rgb(vec3(h, 1.0, 1.0 - i));
     color += stroke(circleSDF(uv, 1.5), 1.0 - i, 0.1, curCol);
   }
   gl_FragColor = vec4(color, 1.0);
 }
-
-// void main () {
-//   vec3 color = 0.5 + 0.5 * cos(time + vUv.xyx + vec3(0.0, 2.0, 4.0));
-//   gl_FragColor = vec4(color, 1.0);
-// }

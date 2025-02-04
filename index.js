@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { OrbitControls } from "jsm/controls/OrbitControls.js";
+
 const w = window.innerWidth;
 const h = window.innerHeight;
 const scene = new THREE.Scene();
@@ -7,6 +9,9 @@ camera.position.z = 5;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
+
+const ctrls = new OrbitControls(camera, renderer.domElement);
+ctrls.enableDamping = true;
 
 async function main () {
   const vsh = await fetch("./vert.glsl");
@@ -26,30 +31,29 @@ async function main () {
     const size = 0.25;
     const geo = new THREE.IcosahedronGeometry(size, 8);
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.x = pos.x;
-    mesh.position.y = pos.y;
-    const offset = (index * 0.001) % 0.05;
+    mesh.position.copy(pos);
     function update () {
-      mesh.rotation.x += 0.01 + offset;
-      mesh.rotation.y += 0.005 + offset;
+      // mesh.rotation.x += 0.01 + offset;
+      // mesh.rotation.y += 0.005 + offset;
     }
     return { mesh, update };
   }
-  const gridSize = 10;
+  
+  // icosahedron
+  const icoGeo = new THREE.IcosahedronGeometry(2.5, 3);
+
+
   const balls = [];
   let ball = {};
-  const startPos = {
-    x: -2.5,
-    y: -2.5
-  };
-  const gap = 0.55;
-  for (let x = 0; x < gridSize; x += 1) {
-    for (let y = 0; y < gridSize; y += 1) {
-      let pos = {x: startPos.x + x * gap, y: startPos.y + y * gap};
-      ball = getBall({ pos, index: x + y});
-      scene.add(ball.mesh);
-      balls.push(ball);
-    }
+
+  const pos = icoGeo.attributes.position;
+  const p = new THREE.Vector3();
+  for (let i = 0, len = pos.count; i < len; i += 1) {
+    p.fromBufferAttribute(pos, i);
+    ball = getBall({ pos: p.clone(), index: i});
+    scene.add(ball.mesh);
+    balls.push(ball);
+    
   }
 
   function animate(t) {
@@ -59,6 +63,7 @@ async function main () {
     uniforms.time.value = t;
     uniforms.resolution.value.set(renderer.domElement.width, renderer.domElement.height);
     renderer.render(scene, camera);
+    ctrls.update();
   }
   animate(0);
 }
