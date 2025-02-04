@@ -32,6 +32,8 @@ float randomFloat (vec2 p) {
   return fract(p.x * p.y);
 }
 
+float hues[9] = float[](0.0, 0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14, 0.16);
+
 void main () {
   vec2 uv = vUv;
   uv -= vec2(0.5);
@@ -40,11 +42,15 @@ void main () {
   vec3 color = vec3(0.0);
   vec3 curCol = hsb2rgb(vec3(1.0, 1.0, 1.0));
   for (float i = 0.0; i < 1.0; i += 0.1) {
-    float n = 0.5;
-    float h = i;
+    float n = randomFloat(vec2(i + 0.9));
+    float h = hues[int(i * 10.0)] + n;
     curCol = hsb2rgb(vec3(h, 1.0, 1.0 - i));
     color += stroke(circleSDF(uv, 1.5), 1.0 - i, 0.1, curCol);
   }
   gl_FragColor = vec4(color, 1.0);
 }
-// https://www.shadertoy.com/view/Ds3GWS
+
+// void main () {
+//   vec3 color = 0.5 + 0.5 * cos(time + vUv.xyx + vec3(0.0, 2.0, 4.0));
+//   gl_FragColor = vec4(color, 1.0);
+// }

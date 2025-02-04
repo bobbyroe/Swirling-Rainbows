@@ -13,8 +13,8 @@ async function main() {
   const fsh = await fetch('../frag.glsl');
 
   const uniforms = {
-    time: { value: 0 },
-    resolution: { value: new THREE.Vector2(w, h)}
+    time: { value: 0.0 },
+    resolution: { value: new THREE.Vector2( w, h )},
   };
 
   const material = new THREE.ShaderMaterial({
@@ -30,11 +30,13 @@ async function main() {
   scene.add(plane);
   
   function animate(t) {
+    t *= 0.0001;
     requestAnimationFrame(animate);
-    uniforms.time.value = t * 0.0001;
+    uniforms.resolution.value.set(renderer.domElement.width, renderer.domElement.height);
+    uniforms.time.value = t;
     renderer.render(scene, camera);
   }
-  animate(0);
+  animate();
 }
 
 main();

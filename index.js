@@ -13,7 +13,8 @@ async function main () {
   const fsh = await fetch("./frag.glsl");
 
   const uniforms = {
-    time: { value: 0.0 }
+    time: { value: 0.0 },
+    resolution: { value: new THREE.Vector2( w, h )},
   };
   const mat = new THREE.ShaderMaterial({
     uniforms,
@@ -23,7 +24,7 @@ async function main () {
 
   function getBall({ pos, index }) {
     const size = 0.25;
-    const geo = new THREE.IcosahedronGeometry(size, 4);
+    const geo = new THREE.IcosahedronGeometry(size, 8);
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.x = pos.x;
     mesh.position.y = pos.y;
@@ -56,6 +57,7 @@ async function main () {
     requestAnimationFrame(animate);
     balls.forEach( b => b.update());
     uniforms.time.value = t;
+    uniforms.resolution.value.set(renderer.domElement.width, renderer.domElement.height);
     renderer.render(scene, camera);
   }
   animate(0);
